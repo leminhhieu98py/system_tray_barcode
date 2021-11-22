@@ -5,7 +5,6 @@ from PIL import Image
 from pyzbar.pyzbar import decode
 import os
 
-
 # Make one method to decode the barcode
 def BarcodeReader(image):
     print("Scanning")

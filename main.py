@@ -7,15 +7,17 @@ from pystray import MenuItem as item
 import pystray
 from PIL import Image
 from barcode_reader import *
-
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
+import time
 
 os.environ['PYSTRAY_BACKEND'] = 'gtk'
 
 # Create an instance of tkinter frame or window
 win = Tk()
 win.title("Barcode File Management")
-win.iconbitmap("@/home/thomas/Downloads/Telegram Desktop/hieu/hieu/barcode-scan-file-with-system-tray-icon-main/barcode.xbm")
-# win.iconbitmap("/barcode.ico")
+# win.iconbitmap("@/home/thomas/Downloads/Telegram Desktop/hieu/hieu/barcode-scan-file-with-system-tray-icon-main/barcode.xbm")
+win.iconbitmap("barcode.ico")
 
 # Set the size of the window
 win.geometry("600x250")
@@ -24,6 +26,10 @@ win.geometry("600x250")
 win.columnconfigure(0, weight=4)
 win.columnconfigure(1, weight=2)
 
+
+class Handler(FileSystemEventHandler):
+    def on_any_event(self, event):
+        scan_engine(root_folder_path, target_folder_path)
 
 
 icon = None
@@ -43,8 +49,6 @@ def write_file(path, content):
 
 root_folder_path = read_file("root.txt")
 target_folder_path = read_file("target.txt")
-
-
 
 
 # Define a function for quit the window
@@ -81,7 +85,21 @@ def select_target_folder():
 
 
 def auto_scan_watch_dog():
-    print("watch dog")
+    if root_folder_path != "" and target_folder_path != "":
+        path = root_folder_path
+        print("watch dog on: " + path)
+        event_handler = Handler()
+        observer = Observer()
+        observer.schedule(event_handler, path, recursive=True)
+        observer.start()
+        try:
+            while True:
+                time.sleep(1)
+        except KeyboardInterrupt:
+            observer.stop()
+        observer.join()
+    else:
+        print("chon path")
 
 
 def auto_scan_activation():
@@ -110,9 +128,9 @@ def display_target_label(label):
 def hide_window():
     global icon
     win.withdraw()
-    image = Image.open("/barcode.xbm")
-    # image = Image.open("/barcode.ico")
-    menu = (item('Scan new file', scan_new_file), item('Show application', show_window), item('Quit', quit_window))
+    # image = Image.open("/barcode.xbm")
+    image = Image.open("barcode.ico")
+    menu = (item('Show application', show_window), item('Quit', quit_window))
     icon = pystray.Icon("name", image, "Barcode File Management", menu)
     icon.run()
 
@@ -121,8 +139,8 @@ def display_other_components():
     # Declare components
     root_select_btn = Button(win, height=2, text="Select root folder", command=select_root_folder)
     target_select_btn = Button(win, height=2, text="Select target folder", command=select_target_folder)
-    auto_scan_btn = Button(win, height=2, width=10, text="Auto scan", command=auto_scan_activation)
-    manual_scan_btn = Button(win, height=2, width=10, text="Manual scan", command=manual_scan_activation)
+    auto_scan_btn = Button(win, height=2, width=12, text="Auto scan", command=auto_scan_activation)
+    manual_scan_btn = Button(win, height=2, width=12, text="Manual scan", command=manual_scan_activation)
 
 
     # Style components
