@@ -15,12 +15,13 @@ os.environ['PYSTRAY_BACKEND'] = 'gtk'
 
 # Create an instance of tkinter frame or window
 win = Tk()
-win.title("Barcode File Management")
+win.title("Barcode File Converter")
 # win.iconbitmap("@/home/thomas/Downloads/Telegram Desktop/hieu/hieu/barcode-scan-file-with-system-tray-icon-main/barcode.xbm")
 win.iconbitmap("barcode.ico")
 
 # Set the size of the window
 win.geometry("600x250")
+win.resizable(width=0, height=0)
 
 # config Grid
 win.columnconfigure(0, weight=4)
